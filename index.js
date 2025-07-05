@@ -1,24 +1,27 @@
 import { GoogleGenAI } from "@google/genai";
-import readlineSync from 'readline-sync'
+import readlineSync from "readline-sync";
+import dotenv from "dotenv";
+dotenv.config();
 
-const ai = new GoogleGenAI({ apiKey: "AIzaSyDQB39JriH9p5LEvG6ojrlrAq6wb4Jk7i4" });
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
+// Create a persistent chat instance with memory
 const chat = ai.chats.create({
-    model: "gemini-2.5-flash",
-    history: [],
-})
-
-
+  model: "gemini-2.5-flash",
+  history: [],
+});
 
 async function main() {
-    const userQuery = readlineSync.question("Ask me anything---> ")
-    const response = await chat.sendMessage({
-        message: userQuery,
-    });
+  while (true) {
+    const userInput = readlineSync.question("Ask me anything ---> ");
+    if (userInput.toLowerCase() === "exit") {
+      console.log("👋 Goodbye!");
+      break;
+    }
 
-    console.log(response.text)
-    
-    main()
+    const response = await chat.sendMessage({ message: userInput });
+    console.log("🤖", response.text);
+  }
 }
 
 await main();
